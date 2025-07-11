@@ -229,7 +229,7 @@ def capture_screenshot(window_id: Optional[str] = None, include_cursor: bool = F
         
         # Convert base64 to bytes and return as Image object for multimodal LLM consumption
         image_bytes = base64.b64decode(base64_data)
-        return Image(data=image_bytes, format="image/png")
+        return Image(data=image_bytes, format="png")
             
     except Exception as e:
         error_msg = f"Screenshot capture failed: {str(e)}"
