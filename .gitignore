@@ -55,6 +55,7 @@ Thumbs.db
 
 # Screenshots (output files)
 /screenshots/
+/Pictures/shotty/
 *.png
 *.jpg
 *.jpeg

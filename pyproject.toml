@@ -13,6 +13,8 @@ authors = [
 ]
 dependencies = [
     "fastmcp>=1.2.0",
+    "PyGObject>=3.42.0",
+    "pydbus>=0.6.0",
 ]
 
 [tool.hatch.build.targets.wheel]

@@ -17,21 +17,34 @@ A Model Context Protocol (MCP) server that provides screenshot capture and windo
 ### Current Capabilities
 - **Window Listing**: Enumerate all visible windows on GNOME desktop
 - **Screenshot Capture**: Full screen and window-specific screenshots
+- **Window State Management**: Remember and restore active windows during capture
+- **XDG Portal Integration**: Modern, secure screenshot capture with user permissions
 - **Window Activation**: Focus specific windows before capture
 - **MCP Integration**: FastMCP-based server for LLM integration
 - **Base64 Encoding**: Images ready for multimodal LLM consumption
 
 ### GNOME Wayland Support
-- Primary method: window-calls GNOME extension
-- Fallback: Process-based window detection
-- Screenshot methods: gnome-screenshot, ImageMagick
+- **Primary**: XDG Desktop Portal (modern, secure, requires user permission)
+- **Secondary**: GNOME Shell D-Bus API via window-calls extension  
+- **Fallback**: Legacy tools (gnome-screenshot, ImageMagick, grim)
+- **Optimized UX**: Automatic window state restoration after captures
 
 ## 📋 Prerequisites
 
 ### Required
-- GNOME Shell on Wayland
-- Python 3.8+
+- GNOME Shell on Wayland (GNOME 42+)
+- Python 3.10+
 - `gnome-screenshot` utility
+
+### Python Dependencies
+- `fastmcp>=1.2.0` (core MCP functionality)
+- `PyGObject>=3.42.0` (XDG Portal integration)
+- `pydbus>=0.6.0` (D-Bus communication)
+
+### System Packages (Ubuntu/Debian)
+```bash
+sudo apt install python3-gi python3-gi-cairo gir1.2-gtk-4.0 libgirepository1.0-dev
+```
 
 ### Recommended Extensions
 - [window-calls](https://extensions.gnome.org/extension/4724/window-calls/) - Enables true window-specific capture and listing
@@ -43,8 +56,11 @@ A Model Context Protocol (MCP) server that provides screenshot capture and windo
 git clone https://github.com/chrimage/shotty.git
 cd shotty
 
-# Install dependencies
-pip install fastmcp
+# Install system packages (Ubuntu/Debian)
+sudo apt install python3-gi python3-gi-cairo gir1.2-gtk-4.0 libgirepository1.0-dev
+
+# Install Python dependencies
+pip install fastmcp PyGObject>=3.42.0 pydbus>=0.6.0
 
 # Install GNOME extension (recommended)
 # Visit: https://extensions.gnome.org/extension/4724/window-calls/
@@ -80,11 +96,18 @@ claude mcp list
 - **Window Listing**: Returns JSON array of windows with IDs and titles
 - **Screenshot Capture**: Returns images that display directly in Claude Code
 - **Window-Specific Capture**: Focuses target window, then captures it
+- **Storage**: Screenshots saved to `~/Pictures/shotty/` directory
+
+#### Permissions & First Run
+- **XDG Portal**: First screenshot may show permission dialog - grant access for persistent permissions
+- **Extension Required**: Window-specific features need the window-calls GNOME extension
+- **User Interaction**: Some portal operations require active window/user interaction
 
 #### Troubleshooting
 - Ensure the window-calls GNOME extension is installed and enabled
 - Check that `gnome-screenshot` is available in your PATH
-- Verify Python dependencies are installed: `pip install fastmcp`
+- Verify Python dependencies are installed: `pip install fastmcp PyGObject pydbus`
+- For "Permission denied" errors, try taking a screenshot manually first to grant portal permissions
 
 ## 🏗️ Architecture
 
