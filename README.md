@@ -61,6 +61,31 @@ python server.py
 - `list_windows()` - Get all visible windows
 - `capture_screenshot(window_id=None, include_cursor=False)` - Capture screenshots
 
+### Development with Claude Code
+
+To test Shotty with Claude Code, add it as an MCP server:
+
+```bash
+# Add the server to Claude Code
+claude mcp add shotty python /path/to/shotty/server.py
+
+# Verify the server is added
+claude mcp list
+
+# Test in Claude Code
+# Use the tools directly: list_windows() and capture_screenshot()
+```
+
+#### Expected Behavior
+- **Window Listing**: Returns JSON array of windows with IDs and titles
+- **Screenshot Capture**: Returns images that display directly in Claude Code
+- **Window-Specific Capture**: Focuses target window, then captures it
+
+#### Troubleshooting
+- Ensure the window-calls GNOME extension is installed and enabled
+- Check that `gnome-screenshot` is available in your PATH
+- Verify Python dependencies are installed: `pip install fastmcp`
+
 ## 🏗️ Architecture
 
 The server implements a dual-approach strategy:
@@ -71,12 +96,24 @@ The server implements a dual-approach strategy:
 
 ## ⚡ Quick Test
 
+### Standalone Testing
 ```python
 # Test window listing
 python -c "from server import _list_windows_via_extension; print(_list_windows_via_extension())"
 
-# Test screenshot capture
-python -c "from server import _capture_window_by_id; _capture_window_by_id('WINDOW_ID')"
+# Test full screen capture (creates Image object)
+python -c "from server import _capture_full_screen; from fastmcp.utilities.types import Image; import base64; data=_capture_full_screen(); img=Image(data=base64.b64decode(data), format='image/png'); print(f'Created {len(img.data)} byte image')"
+```
+
+### MCP Integration Testing
+```bash
+# Add to Claude Code (replace with your actual path)
+claude mcp add shotty python /home/chris/code/mcp-servers/shotty/server.py
+
+# In Claude Code, test with:
+# list_windows()
+# capture_screenshot()
+# capture_screenshot(window_id="WINDOW_ID_FROM_LIST")
 ```
 
 ## 🐛 Known Limitations

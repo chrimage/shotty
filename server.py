@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from fastmcp import FastMCP
+from fastmcp.utilities.types import Image
 
 # Configure logging to stderr (captured by MCP host client)
 logging.basicConfig(
@@ -203,9 +204,9 @@ def _list_windows_via_processes() -> str:
         raise RuntimeError(f"Process detection failed: {str(e)}")
 
 @mcp.tool
-def capture_screenshot(window_id: Optional[str] = None, include_cursor: bool = False) -> str:
+def capture_screenshot(window_id: Optional[str] = None, include_cursor: bool = False) -> Image:
     """
-    Capture a screenshot and return it as a base64-encoded image.
+    Capture a screenshot and return it as an image that multimodal LLMs can view.
     
     Args:
         window_id: Optional window ID to capture. If None, captures the full screen.
@@ -213,7 +214,7 @@ def capture_screenshot(window_id: Optional[str] = None, include_cursor: bool = F
         include_cursor: Whether to include the mouse cursor in the screenshot.
     
     Returns:
-        Base64-encoded PNG image data that can be viewed by multimodal LLMs.
+        Image object containing PNG screenshot data for multimodal LLM viewing.
     
     Note: For specific window capture on Wayland, this will attempt to focus
     the window first, then capture the active window.
@@ -221,10 +222,14 @@ def capture_screenshot(window_id: Optional[str] = None, include_cursor: bool = F
     try:
         if window_id:
             # Try to capture a specific window
-            return _capture_window_by_id(window_id, include_cursor)
+            base64_data = _capture_window_by_id(window_id, include_cursor)
         else:
             # Capture full screen
-            return _capture_full_screen(include_cursor)
+            base64_data = _capture_full_screen(include_cursor)
+        
+        # Convert base64 to bytes and return as Image object for multimodal LLM consumption
+        image_bytes = base64.b64decode(base64_data)
+        return Image(data=image_bytes, format="image/png")
             
     except Exception as e:
         error_msg = f"Screenshot capture failed: {str(e)}"
