@@ -305,8 +305,8 @@ def _capture_window_by_id(window_id: str, include_cursor: bool = False) -> str:
         # Try to focus the window (this might not work without extensions)
         _try_focus_window(window_id)
         
-        # Give the window more time to come to focus and settle
-        time.sleep(1.5)
+        # Brief delay for window focus (ADHD-friendly timing)
+        time.sleep(0.3)
         
         # Capture the active window
         return _capture_active_window(filepath, include_cursor)
