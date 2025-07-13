@@ -126,6 +126,37 @@ claude mcp list
 # Use the tools directly: list_windows() and capture_screenshot()
 ```
 
+### Development with Gemini CLI
+
+To use Shotty with Gemini CLI, add it to your `settings.json` configuration:
+
+```json
+{
+  "mcpServers": {
+    "shotty": {
+      "command": "uvx",
+      "args": ["--from", "https://github.com/chrimage/shotty.git", "shotty"]
+    }
+  }
+}
+```
+
+Or for local development:
+
+```json
+{
+  "mcpServers": {
+    "shotty": {
+      "command": "python",
+      "args": ["/path/to/shotty/server.py"],
+      "cwd": "/path/to/shotty"
+    }
+  }
+}
+```
+
+Then restart Gemini CLI to load the MCP server and use the screenshot tools in your conversations.
+
 #### Expected Behavior
 - **Window Listing**: Returns JSON array of windows with IDs and titles
 - **Screenshot Capture**: Returns images that display directly in Claude Code
