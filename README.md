@@ -108,7 +108,10 @@ python server.py
 - `list_windows()` - Get all visible windows
 - `capture_screenshot(window_id=None, include_cursor=False)` - Capture screenshots
 
-### Development with Claude Code
+## 🔌 MCP Client Integration
+
+<details>
+<summary><b>Claude Code</b></summary>
 
 To test Shotty with Claude Code, add it as an MCP server:
 
@@ -126,7 +129,10 @@ claude mcp list
 # Use the tools directly: list_windows() and capture_screenshot()
 ```
 
-### Development with Gemini CLI
+</details>
+
+<details>
+<summary><b>Gemini CLI</b></summary>
 
 To use Shotty with Gemini CLI, add it to your `settings.json` configuration:
 
@@ -157,22 +163,32 @@ Or for local development:
 
 Then restart Gemini CLI to load the MCP server and use the screenshot tools in your conversations.
 
+</details>
+
 #### Expected Behavior
 - **Window Listing**: Returns JSON array of windows with IDs and titles
 - **Screenshot Capture**: Returns images that display directly in Claude Code
 - **Window-Specific Capture**: Focuses target window, then captures it
 - **Storage**: Screenshots saved to `~/Pictures/shotty/` directory
 
-#### Permissions & First Run
+<details>
+<summary><b>Permissions & First Run</b></summary>
+
 - **XDG Portal**: First screenshot may show permission dialog - grant access for persistent permissions
 - **Extension Required**: Window-specific features need the window-calls GNOME extension
 - **User Interaction**: Some portal operations require active window/user interaction
 
-#### Troubleshooting
+</details>
+
+<details>
+<summary><b>Troubleshooting</b></summary>
+
 - Ensure the window-calls GNOME extension is installed and enabled
 - Check that `gnome-screenshot` is available in your PATH
 - Verify Python dependencies are installed: `pip install fastmcp PyGObject pydbus`
 - For "Permission denied" errors, try taking a screenshot manually first to grant portal permissions
+
+</details>
 
 ## 🏗️ Architecture
 
@@ -182,9 +198,11 @@ The server implements a dual-approach strategy:
 2. **Fallback**: Process-based detection for basic functionality
 3. **Screenshot**: Multiple capture methods with automatic fallback
 
-## ⚡ Quick Test
+## ⚡ Testing
 
-### Standalone Testing
+<details>
+<summary><b>Standalone Testing</b></summary>
+
 ```python
 # Test window listing
 python -c "from server import _list_windows_via_extension; print(_list_windows_via_extension())"
@@ -193,7 +211,11 @@ python -c "from server import _list_windows_via_extension; print(_list_windows_v
 python -c "from server import _capture_full_screen; from fastmcp.utilities.types import Image; import base64; data=_capture_full_screen(); img=Image(data=base64.b64decode(data), format='image/png'); print(f'Created {len(img.data)} byte image')"
 ```
 
-### MCP Integration Testing
+</details>
+
+<details>
+<summary><b>MCP Integration Testing</b></summary>
+
 ```bash
 # Add to Claude Code using uvx (recommended)
 claude mcp add shotty uvx --from https://github.com/chrimage/shotty.git shotty
@@ -206,6 +228,8 @@ claude mcp add shotty python /home/chris/code/mcp-servers/shotty/server.py
 # capture_screenshot()
 # capture_screenshot(window_id="WINDOW_ID_FROM_LIST")
 ```
+
+</details>
 
 ## 🐛 Known Limitations
 
