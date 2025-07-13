@@ -49,36 +49,11 @@ sudo apt install python3-gi python3-gi-cairo gir1.2-gtk-4.0 libgirepository1.0-d
 ### Recommended Extensions
 - [window-calls](https://extensions.gnome.org/extension/4724/window-calls/) - Enables true window-specific capture and listing
 
-## 🛠️ Installation
+## 🔌 Setup
 
-### Quick Start with uvx (Recommended)
+**Shotty is an MCP server** designed to be launched by MCP clients, not run directly by users. You configure your MCP client (Claude Code, Gemini CLI, etc.) to automatically launch the server when needed.
 
-```bash
-# Run directly from GitHub (no installation needed)
-uvx --from https://github.com/chrimage/shotty.git shotty
-
-# Or install locally for persistent use
-uv tool install shotty --from https://github.com/chrimage/shotty.git
-shotty
-```
-
-### Manual Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/chrimage/shotty.git
-cd shotty
-
-# Install system packages (Ubuntu/Debian)
-sudo apt install python3-gi python3-gi-cairo gir1.2-gtk-4.0 libgirepository1.0-dev
-
-# Run with uv
-uv run shotty
-
-# Or install dependencies manually
-pip install fastmcp PyGObject>=3.42.0 pydbus>=0.6.0
-python server.py
-```
+**No separate installation required!** Your MCP client handles launching the server using `uvx` or local Python.
 
 ### System Requirements
 
@@ -90,23 +65,14 @@ python server.py
 
 - [window-calls](https://extensions.gnome.org/extension/4724/window-calls/) - Enables true window-specific capture and listing
 
-## 🔧 Usage
+## 🔧 Available Tools
 
-### As MCP Server
-```bash
-# With uvx (recommended)
-uvx --from https://github.com/chrimage/shotty.git shotty
+Once configured with your MCP client, Shotty provides these tools:
 
-# With uv (from local directory)
-uv run shotty
+- **`list_windows()`** - Get all visible windows with IDs and titles
+- **`capture_screenshot(window_id=None, include_cursor=False)`** - Capture screenshots and save to disk
 
-# Traditional method
-python server.py
-```
-
-### Available Tools
-- `list_windows()` - Get all visible windows
-- `capture_screenshot(window_id=None, include_cursor=False)` - Capture screenshots
+The MCP client automatically launches the server when you use these tools.
 
 ## 🔌 MCP Client Integration
 
