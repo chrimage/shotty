@@ -51,6 +51,19 @@ sudo apt install python3-gi python3-gi-cairo gir1.2-gtk-4.0 libgirepository1.0-d
 
 ## 🛠️ Installation
 
+### Quick Start with uvx (Recommended)
+
+```bash
+# Run directly from GitHub (no installation needed)
+uvx --from https://github.com/chrimage/shotty.git shotty
+
+# Or install locally for persistent use
+uv tool install shotty --from https://github.com/chrimage/shotty.git
+shotty
+```
+
+### Manual Installation
+
 ```bash
 # Clone the repository
 git clone https://github.com/chrimage/shotty.git
@@ -59,17 +72,35 @@ cd shotty
 # Install system packages (Ubuntu/Debian)
 sudo apt install python3-gi python3-gi-cairo gir1.2-gtk-4.0 libgirepository1.0-dev
 
-# Install Python dependencies
-pip install fastmcp PyGObject>=3.42.0 pydbus>=0.6.0
+# Run with uv
+uv run shotty
 
-# Install GNOME extension (recommended)
-# Visit: https://extensions.gnome.org/extension/4724/window-calls/
+# Or install dependencies manually
+pip install fastmcp PyGObject>=3.42.0 pydbus>=0.6.0
+python server.py
 ```
+
+### System Requirements
+
+- GNOME Shell on Wayland (GNOME 42+)
+- Python 3.10+
+- System packages: `python3-gi python3-gi-cairo gir1.2-gtk-4.0 libgirepository1.0-dev`
+
+### Recommended Extensions
+
+- [window-calls](https://extensions.gnome.org/extension/4724/window-calls/) - Enables true window-specific capture and listing
 
 ## 🔧 Usage
 
 ### As MCP Server
 ```bash
+# With uvx (recommended)
+uvx --from https://github.com/chrimage/shotty.git shotty
+
+# With uv (from local directory)
+uv run shotty
+
+# Traditional method
 python server.py
 ```
 
@@ -82,7 +113,10 @@ python server.py
 To test Shotty with Claude Code, add it as an MCP server:
 
 ```bash
-# Add the server to Claude Code
+# Add the server to Claude Code using uvx
+claude mcp add shotty uvx --from https://github.com/chrimage/shotty.git shotty
+
+# Or using local path
 claude mcp add shotty python /path/to/shotty/server.py
 
 # Verify the server is added
@@ -130,7 +164,10 @@ python -c "from server import _capture_full_screen; from fastmcp.utilities.types
 
 ### MCP Integration Testing
 ```bash
-# Add to Claude Code (replace with your actual path)
+# Add to Claude Code using uvx (recommended)
+claude mcp add shotty uvx --from https://github.com/chrimage/shotty.git shotty
+
+# Or using local path (replace with your actual path)
 claude mcp add shotty python /home/chris/code/mcp-servers/shotty/server.py
 
 # In Claude Code, test with:

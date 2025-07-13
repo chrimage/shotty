@@ -927,6 +927,10 @@ def _get_window_geometry_gnome(window_id: str) -> Optional[str]:
         logger.warning(f"Failed to get window geometry from GNOME: {e}")
         return None
 
-if __name__ == "__main__":
+def main():
+    """Main entry point for the shotty MCP server."""
     logger.info("Starting Screenshot MCP Server")
     mcp.run()
+
+if __name__ == "__main__":
+    main()

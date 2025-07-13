@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "screenshot-mcp-server"
+name = "shotty"
 version = "0.1.0"
 description = "A Model Context Protocol server for capturing screenshots in GNOME Wayland environments"
 readme = "README.md"
@@ -16,6 +16,9 @@ dependencies = [
     "PyGObject>=3.42.0",
     "pydbus>=0.6.0",
 ]
+
+[project.scripts]
+shotty = "server:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["server.py"]
