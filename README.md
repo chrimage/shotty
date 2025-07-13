@@ -100,7 +100,12 @@ claude mcp list
 <details>
 <summary><b>Gemini CLI</b></summary>
 
-To use Shotty with Gemini CLI, add it to your `settings.json` configuration:
+To use Shotty with Gemini CLI, add it to your `settings.json` configuration file:
+
+**Settings file locations:**
+- User settings: `~/.gemini/settings.json` 
+- Project settings: `.gemini/settings.json` (in project root)
+- System settings: `/etc/gemini-cli/settings.json` (Linux)
 
 ```json
 {
