@@ -77,6 +77,37 @@ The MCP client automatically launches the server when you use these tools.
 ## 🔌 MCP Client Integration
 
 <details>
+<summary><b>Claude Desktop</b></summary>
+
+Add Shotty to your Claude Desktop configuration file:
+
+**Configuration file location:**
+- **Linux**: `~/.config/Claude/claude_desktop_config.json`
+- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`  
+- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+
+Add this to the `mcpServers` section:
+
+```json
+{
+  "mcpServers": {
+    "shotty": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "https://github.com/chrimage/shotty.git",
+        "shotty"
+      ]
+    }
+  }
+}
+```
+
+Then restart Claude Desktop and use the tools: `list_windows()` and `capture_screenshot()`
+
+</details>
+
+<details>
 <summary><b>Claude Code</b></summary>
 
 To test Shotty with Claude Code, add it as an MCP server:
