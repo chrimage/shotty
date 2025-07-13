@@ -9,11 +9,13 @@ and listing windows in GNOME Wayland environments.
 import base64
 import json
 import logging
+import re
 import subprocess
 import sys
 import tempfile
 import time
 from abc import ABC, abstractmethod
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
@@ -72,6 +74,42 @@ class Window:
             "id": self.id,
             "title": self.title
         }
+
+def generate_screenshot_filename(window_id: Optional[str] = None, window_title: str = "") -> str:
+    """Generate a clean filename for screenshots with ISO 8601 timestamp."""
+    # Create ISO 8601 timestamp (YYYY-MM-DDTHH-MM-SS)
+    timestamp = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
+    
+    if window_id and window_title:
+        # Clean the window title for filename use
+        clean_title = re.sub(r'[^\w\s\-]', '', window_title)  # Remove special chars
+        clean_title = re.sub(r'[\-\s]+', '-', clean_title)    # Replace spaces/dashes with single dash  
+        clean_title = clean_title.strip('-')[:30]             # Limit length and trim dashes
+        
+        if clean_title:
+            return f"window-{clean_title}-{timestamp}.png"
+        else:
+            return f"window-{window_id}-{timestamp}.png"
+    elif window_id:
+        # Window ID but no title
+        return f"window-{window_id}-{timestamp}.png"
+    else:
+        return f"fullscreen-{timestamp}.png"
+
+def get_window_title_by_id(window_id: str) -> str:
+    """Get the window title for a given window ID."""
+    try:
+        # Try to get window title from the windows list
+        windows_json = _list_windows_via_extension()
+        windows_data = json.loads(windows_json)
+        
+        for window in windows_data:
+            if window.get("id") == window_id:
+                return window.get("title", "")
+    except Exception:
+        pass
+    
+    return ""
 
 # Abstract base class for screenshot backends
 class ScreenshotBackend(ABC):
@@ -637,9 +675,8 @@ def _capture_full_screen(include_cursor: bool = False) -> str:
     """Capture the full screen using backend manager."""
     logger.info("Capturing full screen screenshot")
     
-    # Generate filename with timestamp
-    timestamp = int(time.time())
-    filename = f"screenshot_full_{timestamp}.png"
+    # Generate clean filename with ISO 8601 timestamp
+    filename = generate_screenshot_filename()
     filepath = SCREENSHOTS_DIR / filename
     
     # Use backend manager for capture
@@ -673,9 +710,9 @@ def _capture_window_by_id_no_restore(window_id: str, include_cursor: bool = Fals
     """Capture a specific window without window state management (used internally)."""
     logger.info(f"Capturing window with ID: {window_id} (no state management)")
     
-    # Generate filename with timestamp
-    timestamp = int(time.time())
-    filename = f"screenshot_window_{window_id}_{timestamp}.png"
+    # Get window title for clean filename
+    window_title = get_window_title_by_id(window_id)
+    filename = generate_screenshot_filename(window_id, window_title)
     filepath = SCREENSHOTS_DIR / filename
     
     # Use backend manager for capture
