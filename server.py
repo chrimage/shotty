@@ -232,23 +232,19 @@ class XDGPortalBackend(ScreenshotBackend):
         return "XDG Desktop Portal"
 
 class GNOMEShellBackend(ScreenshotBackend):
-    """GNOME Shell backend using gnome-screenshot and grim."""
+    """GNOME Shell backend using gnome-screenshot."""
     
     def is_available(self) -> bool:
         """Check if GNOME Shell tools are available."""
-        tools = ['gnome-screenshot', 'grim']
-        for tool in tools:
-            try:
-                subprocess.run([tool, '--version'], capture_output=True, timeout=2)
-                return True
-            except (subprocess.TimeoutExpired, FileNotFoundError):
-                continue
-        return False
+        try:
+            subprocess.run(['gnome-screenshot', '--version'], capture_output=True, timeout=2)
+            return True
+        except (subprocess.TimeoutExpired, FileNotFoundError):
+            return False
     
     def capture_screen(self, filepath: Path, include_cursor: bool = False) -> bool:
         """Capture screen using GNOME tools."""
         methods = [
-            self._try_grim_full,
             self._try_gnome_screenshot_full,
             self._try_import_full,
         ]
@@ -266,20 +262,12 @@ class GNOMEShellBackend(ScreenshotBackend):
     def capture_window(self, filepath: Path, window_id: str, include_cursor: bool = False) -> bool:
         """Capture window using GNOME tools with focusing."""
         try:
-            # Try geometry-based capture first
-            geometry = _get_window_geometry_gnome(window_id)
-            if geometry:
-                self._try_grim_with_geometry(filepath, geometry, include_cursor)
-                if filepath.exists():
-                    return True
-            
-            # Fallback to focus-based capture
+            # Focus-based capture
             _try_focus_window(window_id)
             time.sleep(0.2)  # Brief delay for window focus
             
             methods = [
                 self._try_gnome_screenshot_window,
-                lambda fp, ic: self._try_grim_window_interactive(fp, ic),
             ]
             
             for method in methods:
@@ -296,16 +284,6 @@ class GNOMEShellBackend(ScreenshotBackend):
             
         return False
     
-    def _try_grim_full(self, filepath: Path, include_cursor: bool = False):
-        """Try capturing full screen with grim."""
-        cmd = ["grim"]
-        if include_cursor:
-            cmd.extend(["-c"])
-        cmd.append(str(filepath))
-        
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
-        if result.returncode != 0:
-            raise RuntimeError(f"grim failed: {result.stderr}")
     
     def _try_gnome_screenshot_full(self, filepath: Path, include_cursor: bool = False):
         """Try capturing full screen with gnome-screenshot."""
@@ -340,30 +318,6 @@ class GNOMEShellBackend(ScreenshotBackend):
         if result.returncode != 0:
             raise RuntimeError(f"gnome-screenshot window capture failed: {result.stderr}")
     
-    def _try_grim_window_interactive(self, filepath: Path, include_cursor: bool = False):
-        """Try capturing window using grim + slurp for interactive selection."""
-        logger.info("Using grim + slurp for interactive window selection")
-        
-        slurp_result = subprocess.run(
-            ['slurp'], capture_output=True, text=True, timeout=30
-        )
-        
-        if slurp_result.returncode != 0:
-            raise RuntimeError(f"slurp selection failed: {slurp_result.stderr}")
-            
-        geometry = slurp_result.stdout.strip()
-        self._try_grim_with_geometry(filepath, geometry, include_cursor)
-    
-    def _try_grim_with_geometry(self, filepath: Path, geometry: str, include_cursor: bool = False):
-        """Use grim with specific geometry coordinates."""
-        cmd = ["grim", "-g", geometry]
-        if include_cursor:
-            cmd.extend(["-c"])
-        cmd.append(str(filepath))
-        
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
-        if result.returncode != 0:
-            raise RuntimeError(f"grim geometry capture failed: {result.stderr}")
     
     @property
     def name(self) -> str:
@@ -836,56 +790,6 @@ def _try_import_active_window(filepath: Path, include_cursor: bool = False):
     if result.returncode != 0:
         raise RuntimeError(f"ImageMagick import window capture failed: {result.stderr}")
 
-def _try_grim_full(filepath: Path, include_cursor: bool = False):
-    """Try capturing full screen with grim."""
-    cmd = ["grim"]
-    
-    if include_cursor:
-        cmd.extend(["-c"])  # Include cursor
-    
-    cmd.append(str(filepath))
-    
-    result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
-    
-    if result.returncode != 0:
-        raise RuntimeError(f"grim full screen capture failed: {result.stderr}")
-
-def _try_grim_window_interactive(filepath: Path, include_cursor: bool = False):
-    """Try capturing window using grim + slurp for interactive selection."""
-    logger.info("Using grim + slurp for interactive window selection")
-    
-    # Step 1: Use slurp to get user-selected coordinates
-    logger.info("Please select the window area with your mouse...")
-    slurp_result = subprocess.run(
-        ['slurp'], 
-        capture_output=True, text=True, timeout=30  # Give user time to select
-    )
-    
-    if slurp_result.returncode != 0:
-        raise RuntimeError(f"slurp selection failed: {slurp_result.stderr}")
-        
-    geometry = slurp_result.stdout.strip()
-    logger.info(f"Selected geometry: {geometry}")
-    
-    # Step 2: Use grim with the selected geometry
-    _try_grim_with_geometry(filepath, geometry, include_cursor)
-
-def _try_grim_with_geometry(filepath: Path, geometry: str, include_cursor: bool = False):
-    """Use grim with specific geometry coordinates."""
-    cmd = ["grim", "-g", geometry]
-    
-    if include_cursor:
-        cmd.extend(["-c"])
-    
-    cmd.append(str(filepath))
-    
-    result = subprocess.run(
-        cmd,
-        capture_output=True, text=True, timeout=10
-    )
-    
-    if result.returncode != 0:
-        raise RuntimeError(f"grim geometry capture failed: {result.stderr}")
 
 def _get_window_geometry_gnome(window_id: str) -> Optional[str]:
     """

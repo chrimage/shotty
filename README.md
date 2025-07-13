@@ -26,7 +26,7 @@ A Model Context Protocol (MCP) server that provides screenshot capture and windo
 ### GNOME Wayland Support
 - **Primary**: XDG Desktop Portal (modern, secure, requires user permission)
 - **Secondary**: GNOME Shell D-Bus API via window-calls extension  
-- **Fallback**: Legacy tools (gnome-screenshot, ImageMagick, grim)
+- **Fallback**: Legacy tools (gnome-screenshot, ImageMagick)
 - **Optimized UX**: Automatic window state restoration after captures
 
 ## 📋 Prerequisites
