@@ -1,3 +1,8 @@
+# Development tools
+.bmad-core/
+.claude/
+.roomodes
+
 # Python
 __pycache__/
 *.py[cod]
